@@ -9,21 +9,20 @@ function App() {
 
   useEffect(() => {
     const getConnectors = async ()=>{
-      const connectorsFromServer = await fetchConnectors()
-      setConnectors(connectorsFromServer)
+      setConnectors(await fetchConnectors())
     }
     getConnectors()
   }, [])
 
   const fetchConnectors = async () =>{
-    const res = await fetch('http://localhost:5000/connectors')
-    const data = res.json()
-    return data
+    const res = await fetch('http://localhost:8083/connectors?expand=info&expand=status')
+    const data = await res.json()
+    return Object.entries(data).map(o=>o[1])
   }
 
 
   const onDeleteConnector = async (id) => {
-    await fetch(`http://localhost:5000/connectors/${id}`, {method:'DELETE'})
+    await fetch(`http://localhost:8083/connectors/${id}`, {method:'DELETE'})
 
     setConnectors(await fetchConnectors())
   }
@@ -33,18 +32,15 @@ function App() {
   }
 
   const onAddNewConnector = async (connectorJson) => {
-    const addedConnector = await fetch(`http://localhost:5000/connectors`, {
+    await fetch(`http://localhost:8083/connectors`, {
       method:'POST',
       headers: {
         'Content-type': 'application/json'
       },
       body: JSON.stringify(connectorJson)
     })
-
-    console.log(addedConnector)
     
-    const connectors = await fetchConnectors()
-    setConnectors(connectors)
+    setConnectors(await fetchConnectors())
 
     setShowAddForm(false)
   }

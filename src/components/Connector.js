@@ -1,45 +1,65 @@
-import { FaTimes, FaStopCircle, FaPlayCircle, FaRedoAlt } from 'react-icons/fa'
+import { FaTimes, FaInfoCircle, FaPlus, FaMinus } from 'react-icons/fa'
 import PropTypes from 'prop-types'
+import Tasks from './Tasks'
+import { useState } from 'react'
+import { Modal } from 'react-modal'
 
-const Connector = ({ connector, onDelete, onStop, onStart, onRestart }) => {
-    const isRunning = connector.status === 'Running'
+//Modal.setAppElement('root');
+
+const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+    },
+  };
+
+const Connector = ({ connector, info, onDelete }) => {
+    const [tasksVisible, setTasksVisible] = useState(false)
+
+    const isRunning = connector.connector.state === 'RUNNING'
+    const showDetail = () => {
+        // TODO: show on model
+        alert(JSON.stringify(info))
+    }
+
+    const hideTasks = () => {
+        setTasksVisible(false)
+    }
+    const showTasks = () => {
+        setTasksVisible(true)
+    }
+
+
     return (
         <div className={`connector ${isRunning ? 'running' : 'failed'}`}>
             <h3><div>{connector.name}</div>
-                <div className="buttonGroup">{isRunning?
-                    <FaStopCircle
+                <div className="buttonGroup">
+                    <FaInfoCircle
+                        style={{ color: 'green', cursor: 'pointer' }}
+                        onClick={showDetail} />
+                    {tasksVisible ? <FaMinus onClick={hideTasks} /> : <FaPlus onClick={showTasks} />}
+                    <FaTimes
                         style={{ color: 'red', cursor: 'pointer' }}
-                        onClick={() => onStop(connector.id)} />
-                    :
-                    <FaPlayCircle
-                        style={{ color: 'green', cursor: 'pointer' }}
-                        onClick={() => onStart(connector.id)} />
-                }
-                <FaRedoAlt
-                        style={{ color: 'green', cursor: 'pointer' }}
-                        onClick={() => onRestart(connector.id)} />
-                <FaTimes
-                    style={{ color: 'red', cursor: 'pointer' }}
-                    onClick={() => onDelete(connector.id)} /></div>
+                        onClick={() => onDelete(connector.name)} />
+                </div>
             </h3>
-            <p>{connector.status}</p>
+            {tasksVisible && <Tasks tasks={connector.tasks} />}
         </div>
     )
 }
 
 Connector.defaultProps = {
     onDelete: (id) => { console.log("TODO: Implement the delete: id=" + id) },
-    onStop: (id) => { console.log("TODO: Implement the stop: id=" + id) },
-    onStart: (id) => { console.log("TODO: Implement the start: id=" + id) },
-    onRestart: (id) => { console.log("TODO: Implement the restart: id=" + id) },
 }
 
 Connector.propTypes = {
     connector: PropTypes.object.isRequired,
+    info: PropTypes.oneOf.isRequired,
     onDelete: PropTypes.func.isRequired,
-    onStop: PropTypes.func.isRequired,
-    onStart: PropTypes.func.isRequired,
-    onRestart: PropTypes.func.isRequired,
 }
 
 export default Connector

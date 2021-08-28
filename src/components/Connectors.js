@@ -6,19 +6,16 @@ const Connectors = ({connectors, onDelete}) => {
         <>
             {
             connectors.length>0 ?
-            connectors.map((connector)=>
-                <Connector    key={connector.id} 
-                        connector={connector} 
-                         onDelete={onDelete}
-                />
-                )
+             connectors.map((connector, index)=>
+                 <Connector key={index} connector={connector.status} info={connector.info} onDelete={onDelete}/>
+                 )
                 :
             <p>Nothing to show</p>}
         </>
     ) 
 }
 
-Connectors.propDefaults={
+Connectors.defaultProps={
     connectors: [],
     onDelete: (id) => {console.log("TODO: implement the onDelete for Connectors, ", id)}
 }
