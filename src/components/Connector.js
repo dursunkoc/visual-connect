@@ -12,20 +12,16 @@ const Connector = ({ connector, info, onDelete }) => {
 
     const isRunning = connector.connector.state === 'RUNNING'
     const showDetail = () => {
-        // TODO: show on model
-        //alert(JSON.stringify(info))
         setModalIsOpen(true)
     }
 
-    const hideTasks = () => {
-        setTasksVisible(false)
-    }
-    const showTasks = () => {
-        setTasksVisible(true)
+    const handleCloseModal = (e) => {
+        e.stopPropagation();
+        setModalIsOpen(false)
     }
 
     const modalStyle = {
-        overlay: { backgroundColor: 'grey' },
+        overlay: { backgroundColor: 'blur' },
         content: {
             top: '50%',
             left: '50%',
@@ -43,7 +39,7 @@ const Connector = ({ connector, info, onDelete }) => {
                     <FaInfoCircle
                         style={{ color: 'green', cursor: 'pointer' }}
                         onClick={showDetail} />
-                    {tasksVisible ? <FaMinus onClick={hideTasks} /> : <FaPlus onClick={showTasks} />}
+                    {tasksVisible ? <FaMinus onClick={() => setTasksVisible(false)} /> : <FaPlus onClick={() => setTasksVisible(true)} />}
                     <FaTimes
                         style={{ color: 'red', cursor: 'pointer' }}
                         onClick={() => onDelete(connector.name)} />
@@ -52,10 +48,10 @@ const Connector = ({ connector, info, onDelete }) => {
                     style={modalStyle}>
                     <h3>{connector.name}</h3>
                     <div className="container info">
-                        <pre>{JSON.stringify(info, (k,v)=>k==="tasks"||k==="type"?undefined:v, 2)}</pre>
+                        <pre>{JSON.stringify(info, (k, v) => k === "tasks" || k === "type" ? undefined : v, 2)}</pre>
                     </div>
                     <div>
-                        <Button onClick={() => setModalIsOpen(false)} text="Close" />
+                        <Button onClick={handleCloseModal} text="Close" />
                     </div>
                 </Modal>
             </h3>

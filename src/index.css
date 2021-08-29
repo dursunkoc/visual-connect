@@ -21,12 +21,13 @@ body {
 }
 
 .container.info {
-  max-width: 500px;
-  margin: 30px auto;
+  max-width: 600px;
+  margin: 10px auto;
   overflow: auto;
   min-height: 300px;
+  max-height: 350px;
   border: 1px solid steelblue;
-  padding: 30px;
+  padding: 10px;
   border-radius: 5px;
   font-size: 12px;
 }

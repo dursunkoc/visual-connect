@@ -41,6 +41,11 @@
             "id": 0,
             "state": "RUNNING",
             "worker_id": "172.18.0.7:8083"
+          },
+          {
+            "id": 1,
+            "state": "RUNNING",
+            "worker_id": "172.18.0.7:8084"
           }
         ],
         "type": "sink"
@@ -94,6 +99,57 @@
           }
         ],
         "type": "source"
+      }
+    },
+    "jdbc-sink-customers-post": {
+      "info": {
+        "name": "jdbc-sink-customers-post",
+        "config": {
+          "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+          "dialect.name": "OracleDatabaseDialect",
+          "table.name.format": "CUSTOMERS",
+          "connection.password": "dbz",
+          "tasks.max": "1",
+          "topics": "dbz_oracle.INVENTORY.CUSTOMERS",
+          "transforms": "unwrap",
+          "delete.enabled": "true",
+          "connection.user": "INVENTORY",
+          "transforms.unwrap.drop.tombstones": "false",
+          "name": "jdbc-sink-customers-post",
+          "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+          "auto.create": "true",
+          "connection.url": "jdbc:oracle:thin:@trg_oracle:1521:XE",
+          "insert.mode": "upsert",
+          "pk.mode": "record_key",
+          "pk.fields": "ID"
+        },
+        "tasks": [
+          {
+            "connector": "jdbc-sink-customers-post",
+            "task": 0
+          }
+        ],
+        "type": "sink"
+      },
+      "status": {
+        "name": "jdbc-sink-customers-post",
+        "connector": {
+          "state": "RUNNING",
+          "worker_id": "172.18.0.7:8083"
+        },
+        "tasks": [
+          {
+            "id": 0,
+            "state": "RUNNING",
+            "worker_id": "172.18.0.7:8083"
+          },
+          {
+            "id": 1,
+            "state": "RUNNING",
+            "worker_id": "172.18.0.7:8084"
+          }
+        ],
+        "type": "sink"
       }
     }
   },
