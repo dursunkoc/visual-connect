@@ -39,7 +39,7 @@ const Task = ({task}) => {
                     style={modalStyle}>
                     <h3>Task Error {task.id} - {task.worker_id}</h3>
                     <div className="container info">
-                        {task.trace}
+                        <pre>{task.trace}</pre>
                     </div>
                     <div>
                         <Button onClick={handleCloseModal} text="Close" />

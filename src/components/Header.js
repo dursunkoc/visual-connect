@@ -1,7 +1,12 @@
 import PropTypes from 'prop-types'
+import { useContext } from 'react'
+import { Context } from '../Store'
 import Button from './Button'
 
+
 const Header = ({ title, showAddForm, onShowAddForm, onRefresh }) => {
+    const [state, setState] = useContext(Context)
+
     const onAdd = (e) => {
         onShowAddForm(e)
     }
@@ -9,6 +14,7 @@ const Header = ({ title, showAddForm, onShowAddForm, onRefresh }) => {
     return (
         <header>
             <h1>{title}</h1>
+            <input value={state.kafkaConnectUrl} onChange={(e) => setState({ ...state, kafkaConnectUrl: e.target.value })} /><br/>
             <Button color={showAddForm?'red':'green'} text={showAddForm?'Close Add Form':'Show Add Form'} onClick={onAdd} />
             <Button color={'green'} text={'Refresh'} onClick={onRefresh} />
         </header>
