@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 
 const initialState = {
-    kafkaConnectUrl: 'http://localhost:8083'
+    kafkaConnectUrl: 'http://localhost:8083',
+    connectors: []
 }
 
 

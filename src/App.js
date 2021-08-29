@@ -6,8 +6,7 @@ import { Context } from './Store'
 
 function App() {
   const [showAddForm, setShowAddForm] = useState(false)
-  const [connectors, setConnectors] = useState([])
-  const [state,] = useContext(Context)
+  const [state, setState] = useContext(Context)
 
   const fetchConnectors = async (url) => {
     try {
@@ -23,16 +22,16 @@ function App() {
   useEffect(() => {
     const getConnectors = async () => {
       let data = await fetchConnectors(state.kafkaConnectUrl)
-      setConnectors(data)
+      setState(st=>({...st, connectors: data}))
     }
     getConnectors()
-  }, [state.kafkaConnectUrl])
+  }, [state.kafkaConnectUrl, setState])
 
 
   const onDeleteConnector = async (name) => {
     await fetch(`${state.kafkaConnectUrl}/connectors/${name}`, { method: 'DELETE' })
     let data = await fetchConnectors(state.kafkaConnectUrl)
-    setConnectors(data)
+    setState({...state, connectors: data})
   }
 
   const onShowAddFormClick = (e) => {
@@ -41,7 +40,7 @@ function App() {
 
   const onRefreshData = async (e) => {
     let data = await fetchConnectors(state.kafkaConnectUrl)
-    setConnectors(data)
+    setState(state=>({...state, connectors: data}))
   }
 
   const onAddNewConnector = async (connectorJson) => {
@@ -61,7 +60,7 @@ function App() {
       alert(`Operation Failed check kafka-connect logs!`)
     }
     let data = await fetchConnectors(state.kafkaConnectUrl)
-    setConnectors(data)
+    setState(state=>({...state, connectors: data}))
   }
 
   return (
@@ -69,7 +68,7 @@ function App() {
       <Header title="Connectors" showAddForm={showAddForm} onShowAddForm={onShowAddFormClick} onRefresh={() => onRefreshData()} />
       {showAddForm && <AddConnector onAdd={onAddNewConnector} />}
 
-      <Connectors connectors={connectors} onDelete={onDeleteConnector} />
+      <Connectors onDelete={onDeleteConnector} />
     </div>
   );
 }

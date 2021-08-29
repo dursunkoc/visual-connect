@@ -55,7 +55,7 @@ const Connector = ({ connector, info, onDelete }) => {
                     </div>
                 </Modal>
             </h3>
-            {tasksVisible && <Tasks tasks={connector.tasks} />}
+            {tasksVisible && <Tasks tasks={connector.tasks} connectorName={connector.name} />}
         </div>
     )
 }

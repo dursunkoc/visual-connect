@@ -1,12 +1,15 @@
 import Connector from "./Connector"
 import PropTypes from 'prop-types'
+import { useContext } from "react"
+import { Context } from "../Store"
 
-const Connectors = ({connectors, onDelete}) => {
+const Connectors = ({onDelete}) => {
+    const [state] = useContext(Context)
     return (
         <>
             {
-            connectors.length>0 ?
-             connectors.map((connector, index)=>
+            state.connectors.length>0 ?
+            state.connectors.map((connector, index)=>
                  <Connector key={index} connector={connector.status} info={connector.info} onDelete={onDelete}/>
                  )
                 :
