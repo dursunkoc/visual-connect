@@ -7,8 +7,6 @@ const Task = ({task}) => {
         }
     }
 
-    const isRunning = task.state === 'RUNNING'
-
     return (
         <div className={`task ${task.state.toLowerCase()}`} onClick={showTrace}>
             <h3>{task.id} - {task.worker_id}</h3>
