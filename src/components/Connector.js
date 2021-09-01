@@ -21,7 +21,7 @@ const Connector = ({ connector, info, onDelete }) => {
     }
 
     const modalStyle = {
-        overlay: { backgroundColor: 'blur' },
+        overlay: { backgroundColor: 'gray' },
         content: {
             top: '50%',
             left: '50%',

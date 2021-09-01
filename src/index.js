@@ -4,11 +4,24 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Store from './Store';
+import { transitions, positions, Provider as AlertProvider } from 'react-alert'
+import AlertTemplate from './components/AlertTemplate'
+
+const options = {
+  // you can also just use 'bottom center'
+  position: positions.TOP_CENTER,
+  timeout: 3500,
+  offset: '30px',
+  // you can also just use 'scale'
+  transition: transitions.SCALE
+}
 
 ReactDOM.render(
   <React.StrictMode>
     <Store>
-    <App />
+      <AlertProvider template={AlertTemplate} {...options}>
+        <App />
+      </AlertProvider>
     </Store>
   </React.StrictMode>,
   document.getElementById('root')

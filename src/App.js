@@ -3,10 +3,23 @@ import Header from './components/Header'
 import { useEffect, useState, useContext } from 'react'
 import AddConnector from './components/AddConnector'
 import { Context } from './Store'
+import Modal from 'react-modal'
+import { css } from "@emotion/react";
+import CircleLoader from "react-spinners/CircleLoader";
+import { useAlert } from 'react-alert'
 
+const loadingCssOverride = css`
+  display: block;
+  margin: 0 auto;
+  border-color: steelblue;
+`;
+
+Modal.setAppElement('#root')
 function App() {
-  const [showAddForm, setShowAddForm] = useState(false)
   const [state, setState] = useContext(Context)
+  const [modalIsOpen, setModalIsOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const alert = useAlert()
 
   const fetchConnectors = async (url) => {
     try {
@@ -22,53 +35,93 @@ function App() {
   useEffect(() => {
     const getConnectors = async () => {
       let data = await fetchConnectors(state.kafkaConnectUrl)
-      setState(st=>({...st, connectors: data}))
+      setState(st => ({ ...st, connectors: data }))
     }
     getConnectors()
+    setLoading(false)
   }, [state.kafkaConnectUrl, setState])
 
-
   const onDeleteConnector = async (name) => {
-    await fetch(`${state.kafkaConnectUrl}/connectors/${name}`, { method: 'DELETE' })
-    let data = await fetchConnectors(state.kafkaConnectUrl)
-    setState({...state, connectors: data})
+    setLoading(true)
+    try {
+      await fetch(`${state.kafkaConnectUrl}/connectors/${name}`, { method: 'DELETE' })
+      let data = await fetchConnectors(state.kafkaConnectUrl)
+      setState({ ...state, connectors: data })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const onShowAddFormClick = (e) => {
-    setShowAddForm(!showAddForm)
+    setModalIsOpen(true);
+  }
+
+  const handleCloseModal = (e) => {
+    e.stopPropagation();
+    setModalIsOpen(false)
+  }
+
+  const modalStyle = {
+    overlay: { backgroundColor: 'gray' },
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      transform: 'translate(-50%, -50%)',
+    }
   }
 
   const onRefreshData = async (e) => {
-    let data = await fetchConnectors(state.kafkaConnectUrl)
-    setState(state=>({...state, connectors: data}))
+    setLoading(true)
+    try {
+      let data = await fetchConnectors(state.kafkaConnectUrl)
+      setState(state => ({ ...state, connectors: data }))
+    } finally {
+      setLoading(false)
+    }
   }
 
   const onAddNewConnector = async (connectorJson) => {
-    const resp = await fetch(`${state.kafkaConnectUrl}/connectors`, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(connectorJson)
-    })
-
-    setShowAddForm(false)
-    const addedConnectorData = await resp.json()
-    if (addedConnectorData) {
-      alert(`Successfully added connector ${addedConnectorData.name}`)
-    } else {
-      alert(`Operation Failed check kafka-connect logs!`)
+    setLoading(true)
+    try {
+      const resp = await fetch(`${state.kafkaConnectUrl}/connectors`, {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(connectorJson)
+      })
+      const addedConnectorData = await resp.json()
+      if (addedConnectorData.name) {
+        alert.success(`Successfully added connector ${addedConnectorData.name}`)
+      } else {
+        alert.error(`Operation Failed check kafka-connect logs!`)
+      }
+      let data = await fetchConnectors(state.kafkaConnectUrl)
+      setState({ ...state, connectors: data })
+    } finally {
+      setModalIsOpen(false)
+      setLoading(false)
     }
-    let data = await fetchConnectors(state.kafkaConnectUrl)
-    setState(state=>({...state, connectors: data}))
   }
 
   return (
     <div className="container">
-      <Header title="Connectors" showAddForm={showAddForm} onShowAddForm={onShowAddFormClick} onRefresh={() => onRefreshData()} />
-      {showAddForm && <AddConnector onAdd={onAddNewConnector} />}
-
-      <Connectors onDelete={onDeleteConnector} />
+      {loading ?
+        <CircleLoader color='steelblue' loading={loading} css={loadingCssOverride} size={150} />
+        :
+        <>
+          <Header title="Connectors" onShowAddForm={onShowAddFormClick} onRefresh={onRefreshData} />
+          <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}
+            style={modalStyle}>
+            <div className="container addnew">
+              <AddConnector onAdd={onAddNewConnector} onCancel={handleCloseModal} />
+            </div>
+          </Modal>
+          <Connectors onDelete={onDeleteConnector} />
+        </>
+      }
     </div>
   );
 }

@@ -1,12 +1,15 @@
 import { useState } from 'react'
+import { useAlert } from 'react-alert'
+import Button from './Button'
 
-const AddConnector = ({onAdd}) => {
+const AddConnector = ({onAdd, onCancel}) => {
     const [connectorStr, setConnectorStr] = useState("")
+    const alert = useAlert()
 
     const onSubmit = (e) => {
         e.preventDefault()
         if (!connectorStr){
-            alert("Please insert a valid Connector definition!")
+            alert.error("Please insert a valid Connector definition!")
             return
         }
         try {
@@ -14,7 +17,7 @@ const AddConnector = ({onAdd}) => {
             onAdd(connectorJson)
             setConnectorStr("")
         } catch (error) {
-            alert("Please insert a valid Connector definition!")
+            alert.error("Please insert a valid Connector definition!")
             return
         }
     }
@@ -31,7 +34,8 @@ const AddConnector = ({onAdd}) => {
                     value={connectorStr}
                     onChange={onConnectorDefinitionChange} />
             </div>
-            <input type='submit' value='Save Connector' className='btn btn-block' />
+            <Button color='green' onClick={onSubmit} text='Save'/>
+            <Button color='red' onClick={onCancel} text='Cancel'/>
         </form>
     )
 }

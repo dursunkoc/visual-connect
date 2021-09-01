@@ -4,11 +4,13 @@ import { FaExclamationCircle, FaRedo } from 'react-icons/fa'
 import Modal from 'react-modal'
 import Button from './Button'
 import { Context } from '../Store'
+import { useAlert } from 'react-alert'
 
 Modal.setAppElement('#root')
 const Task = ({task, connectorName}) => {
     const [modalIsOpen, setModalIsOpen] = useState(false)
     const [state, setState] = useContext(Context)
+    const alert = useAlert()
 
     const showTrace = () =>{
         if (task.trace){
@@ -38,9 +40,9 @@ const Task = ({task, connectorName}) => {
         const restartStatus = restartResp.status
         
         if(restartStatus<=300 && restartStatus>=200){
-            alert("Successfully triggered restart");
+            alert.success("Successfully triggered restart");
         }else{
-            alert("Failed to trigger restart please check Kafka Connect logs.");
+            alert.error("Failed to trigger restart please check Kafka Connect logs.");
         }
         
         let data = await fetchConnectors(state.kafkaConnectUrl)

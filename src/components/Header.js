@@ -4,7 +4,7 @@ import { Context } from '../Store'
 import Button from './Button'
 
 
-const Header = ({ title, showAddForm, onShowAddForm, onRefresh }) => {
+const Header = ({ title, onShowAddForm, onRefresh }) => {
     const [state, setState] = useContext(Context)
 
     const onAdd = (e) => {
@@ -15,7 +15,7 @@ const Header = ({ title, showAddForm, onShowAddForm, onRefresh }) => {
         <header>
             <h1>{title}</h1>
             <input value={state.kafkaConnectUrl} onChange={(e) => setState({ ...state, kafkaConnectUrl: e.target.value })} /><br/>
-            <Button color={showAddForm?'red':'green'} text={showAddForm?'Close Add Form':'Show Add Form'} onClick={onAdd} />
+            <Button color={'green'} text={'Add Connector'} onClick={onAdd} />
             <Button color={'green'} text={'Refresh'} onClick={onRefresh} />
         </header>
     )

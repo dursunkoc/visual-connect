@@ -32,6 +32,18 @@ body {
   font-size: 12px;
 }
 
+.container.addnew {
+  max-width: 700px;
+  margin: 10px auto;
+  overflow: auto;
+  min-height: 300px;
+  max-height: 450px;
+  border: 1px solid green;
+  padding: 0px 20px 0px 25px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
 .buttonGroup{
   display: grid;
   grid-auto-flow: column;
