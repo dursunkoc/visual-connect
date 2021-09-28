@@ -29,5 +29,5 @@ docker-compose stop [service-name here]
 - Whenever you want to start an existing service use the following command.
 
 ```shell
-docker-compose stop [service-name here]
+docker-compose start [service-name here]
 ```
