@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useAlert } from 'react-alert'
 import Button from './Button'
 
-const AddConnector = ({onAdd, onCancel}) => {
-    const [connectorStr, setConnectorStr] = useState("")
+const AddConnector = ({onAdd, onCancel, currentConnectorStr}) => {
+    const [connectorStr, setConnectorStr] = useState(currentConnectorStr)
     const alert = useAlert()
 
     const onSubmit = (e) => {
