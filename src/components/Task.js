@@ -64,17 +64,19 @@ const Task = ({task, connectorName}) => {
 
     return (
         <div className={`task ${task.state.toLowerCase()}`}>
+            <label className="taskid">@{task.worker_id}</label>
             <h3>Task - {task.id}
                 <div className="buttonGroup">
-                    {task.trace && <>
-                        <FaExclamationCircle
+                {task.trace && 
+                    <>
+                    <FaExclamationCircle
                         style={{ color: 'red'}}
                         onClick={showTrace} />
                     <FaRedo
                         style={{ color: 'lighblue'}}
                         onClick={restartTask} />
-                    </>}
-                    
+                    </>
+                }
                 </div>
             </h3>
             <Modal isOpen={modalIsOpen} onRequestClose={handleCloseModal}
