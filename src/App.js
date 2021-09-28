@@ -5,7 +5,7 @@ import AddConnector from './components/AddConnector'
 import { Context } from './Store'
 import Modal from 'react-modal'
 import { css } from "@emotion/react";
-import CircleLoader from "react-spinners/CircleLoader";
+import Loader from "react-spinners/MoonLoader";
 import { useAlert } from 'react-alert'
 
 const loadingCssOverride = css`
@@ -18,14 +18,13 @@ Modal.setAppElement('#root')
 function App() {
   const [state, setState] = useContext(Context)
   const [modalIsOpen, setModalIsOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
   const alert = useAlert()
 
   const fetchConnectors = async (url) => {
     try {
       const res = await fetch(`${url}/connectors?expand=info&expand=status`)
       const data = await res.json()
-      return Object.entries(data).map(o => o[1])
+      return (Object.entries(data).map(o => o[1]).sort((a,b)=>a.info.name > b.info.name ? 1:-1))
     } catch (error) {
       console.log(error)
       return []
@@ -34,21 +33,71 @@ function App() {
 
   useEffect(() => {
     const getConnectors = async () => {
+      setState(st => ({ ...st, loading:true }))  
       let data = await fetchConnectors(state.kafkaConnectUrl)
-      setState(st => ({ ...st, connectors: data }))
+      setState(st => ({ ...st, connectors: data, loading:false  }))
     }
     getConnectors()
-    setLoading(false)
   }, [state.kafkaConnectUrl, setState])
 
   const onDeleteConnector = async (name) => {
-    setLoading(true)
+    setState(st => ({ ...st, loading:true }))
     try {
       await fetch(`${state.kafkaConnectUrl}/connectors/${name}`, { method: 'DELETE' })
       let data = await fetchConnectors(state.kafkaConnectUrl)
       setState({ ...state, connectors: data })
     } finally {
-      setLoading(false)
+      setState(st => ({ ...st, loading:false }))
+    }
+  }
+
+  const onPauseConnector = async (name) => {
+    setState(st => ({ ...st, loading:true }))
+    try {
+      await fetch(`${state.kafkaConnectUrl}/connectors/${name}/pause`, { method: 'PUT' })
+      let data = await fetchConnectors(state.kafkaConnectUrl)
+      setState({ ...state, connectors: data })
+    } finally {
+      setState(st => ({ ...st, loading:false }))
+    }
+  }
+
+  const onResumeConnector = async (name) => {
+    setState(st => ({ ...st, loading:true }))
+    try {
+      await fetch(`${state.kafkaConnectUrl}/connectors/${name}/resume`, { method: 'PUT' })
+      let data = await fetchConnectors(state.kafkaConnectUrl)
+      setState({ ...state, connectors: data })
+    } finally {
+      setState(st => ({ ...st, loading:false }))
+    }
+  }
+
+  const onRestartConnector = async(name) => {
+    setState(st => ({ ...st, loading:true }))
+    try {
+      await fetch(`${state.kafkaConnectUrl}/connectors/${name}/restart`, { method: 'POST' })
+      let data = await fetchConnectors(state.kafkaConnectUrl)
+      setState({ ...state, connectors: data })
+    } finally {
+      setState(st => ({ ...st, loading:false }))
+    }
+  }
+
+  const onUpdateConnector = async(name, connectorStr) => {
+    setState(st => ({ ...st, loading:true }))
+    try {
+      console.log(`updating connector: ${name}, with: ${JSON.stringify(connectorStr)}`);
+      let updated = await fetch(`${state.kafkaConnectUrl}/connectors/${name}/config`, { method: 'PUT',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(connectorStr)})
+      console.log(`response: ${JSON.stringify(updated)}`)
+      let data = await fetchConnectors(state.kafkaConnectUrl)
+      setState({ ...state, connectors: data })
+    } finally {
+      setState(st => ({ ...st, loading:false }))
     }
   }
 
@@ -73,17 +122,17 @@ function App() {
   }
 
   const onRefreshData = async (e) => {
-    setLoading(true)
+    setState(st => ({ ...st, loading:true }))
     try {
       let data = await fetchConnectors(state.kafkaConnectUrl)
-      setState(state => ({ ...state, connectors: data }))
+      setState(_state => ({ ..._state, connectors: data }))
     } finally {
-      setLoading(false)
+      setState(st => ({ ...st, loading:false }))
     }
   }
 
   const onAddNewConnector = async (connectorJson) => {
-    setLoading(true)
+    setState(st => ({ ...st, loading:true }))
     try {
       const resp = await fetch(`${state.kafkaConnectUrl}/connectors`, {
         method: 'POST',
@@ -100,16 +149,18 @@ function App() {
       }
       let data = await fetchConnectors(state.kafkaConnectUrl)
       setState({ ...state, connectors: data })
+    } catch(error){
+      console.error(error);
     } finally {
       setModalIsOpen(false)
-      setLoading(false)
+      setState(st => ({ ...st, loading:false }))
     }
   }
 
   return (
     <div className="container">
-      {loading ?
-        <CircleLoader color='steelblue' loading={loading} css={loadingCssOverride} size={150} />
+      {state.loading ?
+        <Loader color='steelblue' loading={state.loading} css={loadingCssOverride} size={150} />
         :
         <>
           <Header title="Connectors" onShowAddForm={onShowAddFormClick} onRefresh={onRefreshData} />
@@ -119,7 +170,18 @@ function App() {
               <AddConnector onAdd={onAddNewConnector} onCancel={handleCloseModal} />
             </div>
           </Modal>
-          <Connectors onDelete={onDeleteConnector} />
+          <Connectors connectorType='sink'
+                      onDelete={onDeleteConnector}
+                      onPause={onPauseConnector} 
+                      onResume={onResumeConnector} 
+                      onRestart={onRestartConnector}
+                      onUpdate={onUpdateConnector}/>
+          <Connectors connectorType='source'
+                      onDelete={onDeleteConnector}
+                      onPause={onPauseConnector} 
+                      onResume={onResumeConnector} 
+                      onRestart={onRestartConnector}
+                      onUpdate={onUpdateConnector}/>
         </>
       }
     </div>
